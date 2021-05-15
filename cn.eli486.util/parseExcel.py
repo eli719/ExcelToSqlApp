@@ -1,5 +1,5 @@
-import pandas as pd
 from pandas import DataFrame
+from pandas import read_excel
 from Field import *
 import os
 import logging
@@ -8,6 +8,8 @@ import logging
 def create_template(fileName, table_comment):
     logging.info("========开始创建模板Excel %s=========", fileName)
     data = [["字段名", "字段类型", "是否允许为空", "注释", "约束类型", "约束名称", "索引类型", "索引名称"]]
+    if table_comment == '':
+        table_comment = '请输入表注释'
     DataFrame(data).to_excel(fileName, index=False, header=False, sheet_name=table_comment)
     logging.info("========创建模板Excel完成=========")
 
@@ -16,7 +18,7 @@ def excel_to_sql(fileName):
     logging.info("========开始解析模板Excel %s=========", fileName)
     table_name = os.path.basename(fileName).split(".")[0]
     logging.info("========表名为 %s=========", table_name)
-    data = pd.read_excel(fileName, sheet_name=None)
+    data = read_excel(fileName, sheet_name=None)
     # print(data)
     table_comment = list(data.keys())[0]
     logging.info("========表注释为 %s=========", table_comment)
@@ -86,10 +88,10 @@ def excel_to_sql(fileName):
     sql = [create_table_sql, comment, primary]
     sql.extend(constraints)
     sql.extend(indexes)
-    drop_sql = "drop table "+table_name
+    drop_sql = "drop table " + table_name
     # print(sql)
     # print(create_table_sql)
     # print(comment)
     # print(primary)
     logging.info("========解析完成,建表SQL为 %s=========", ''.join(sql))
-    return sql,drop_sql
+    return sql, drop_sql

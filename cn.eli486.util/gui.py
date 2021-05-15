@@ -1,7 +1,13 @@
 from tkinter.filedialog import *
 from tkinter.messagebox import *
+from tkinter import Tk
+from tkinter import Label
+from tkinter import StringVar
+from tkinter import Button
+from tkinter import Entry
+from tkinter import Text
+from tkinter.constants import INSERT
 
-from cx_Oracle import DatabaseError
 
 from parseExcel import excel_to_sql, create_template
 import winreg

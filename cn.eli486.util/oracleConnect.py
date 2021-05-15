@@ -1,14 +1,14 @@
-import cx_Oracle as Cx
 from cx_Oracle import DatabaseError
+from cx_Oracle import connect
 import logging
-from tkinter.messagebox import *
+from tkinter.messagebox import showerror
 
 
 # clpnb/clpnb@192.168.227.130:1521/orcl
 def test_connect(oracle_address):
     global con
     try:
-        con = Cx.connect(oracle_address)
+        con = connect(oracle_address)
         return True, con
     except DatabaseError:
         # print("连接异常")
