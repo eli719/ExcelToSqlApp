@@ -1,5 +1,5 @@
 class Field:
-    def __init__(self, name, kinds, isEmpty, comment, constrainType, constrainName, indexType, indexName):
+    def __init__(self, name, comment,kinds, isEmpty,  constrainType, constrainName, indexType, indexName):
         self._comment = comment
         self._isEmpty = isEmpty
         self._indexName = indexName
@@ -43,5 +43,5 @@ class Field:
 
     def __repr__(self):
         return ','.join(str(item) for item in (
-            self.name, self._kinds, self._isEmpty, self._isEmpty, self._comment, self._constrainType, self._constrainName,
+            self.name, self._comment,self._kinds, self._isEmpty,   self._constrainType, self._constrainName,
             self._indexType, self._indexName))

@@ -7,7 +7,7 @@ import logging
 
 def create_template(fileName, table_comment):
     logging.info("========开始创建模板Excel %s=========", fileName)
-    data = [["字段名", "字段类型", "是否允许为空", "注释", "约束类型", "约束名称", "索引类型", "索引名称"]]
+    data = [["字段名", "注释", "字段类型", "是否允许为空", "约束类型", "约束名称", "索引类型", "索引名称"]]
     if table_comment == '':
         table_comment = '请输入表注释'
     DataFrame(data).to_excel(fileName, index=False, header=False, sheet_name=table_comment)
@@ -52,7 +52,7 @@ def excel_to_sql(fileName):
         if j.name is None:
             continue
 
-        comments.append("comment on " + j.name + " is '" + j.comment + "'")
+        comments.append("comment on column " + table_name + "." + j.name + " is '" + j.comment + "'")
 
         if j.is_empty:
             c.append(j.name + ' ' + j.kinds)
@@ -81,11 +81,15 @@ def excel_to_sql(fileName):
     # print(''.join(comments))
 
     body = ','.join(c)
-    p = ','.join(primaries)
+
     create_table_sql = 'CREATE TABLE ' + table_name + '(' + body + ')'
     comment = "comment on table " + table_name + " is '" + table_comment + "'"
-    primary = "alter table " + table_name + " add constraint " + primary_name + " primary key (" + p + ")"
-    sql = [create_table_sql, comment, primary]
+    sql = [create_table_sql, comment]
+    if len(primaries) > 0:
+        p = ','.join(primaries)
+        primary = "alter table " + table_name + " add constraint " + primary_name + " primary key (" + p + ")"
+        sql.extend(primary)
+    sql.extend(comments)
     sql.extend(constraints)
     sql.extend(indexes)
     drop_sql = "drop table " + table_name
@@ -93,5 +97,5 @@ def excel_to_sql(fileName):
     # print(create_table_sql)
     # print(comment)
     # print(primary)
-    logging.info("========解析完成,建表SQL为 %s=========", ''.join(sql))
+    logging.info("========解析完成,建表SQL为\r\n%s=========", ';\r\n'.join(sql))
     return sql, drop_sql
