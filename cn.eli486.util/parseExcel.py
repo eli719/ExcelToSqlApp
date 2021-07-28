@@ -87,7 +87,7 @@ def excel_to_sql(fileName):
     sql = [create_table_sql, comment]
     if len(primaries) > 0:
         p = ','.join(primaries)
-        primary = "alter table " + table_name + " add constraint " + primary_name + " primary key (" + p + ")"
+        primary = ["alter table " + table_name + " add constraint " + primary_name + " primary key (" + p + ")"]
         sql.extend(primary)
     sql.extend(comments)
     sql.extend(constraints)
