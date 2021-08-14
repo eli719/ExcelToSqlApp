@@ -11,10 +11,10 @@ from tkinter.messagebox import showinfo, showerror, showwarning, askyesno, askok
 from tkinter import scrolledtext
 from tkinter.ttk import Combobox
 
-from eli486.util.createTableTool.parseExcel import excel_to_sql, create_template
+from parseExcel import excel_to_sql, create_template
 import winreg
 import logging
-from eli486.util.createTableTool.oracleConnect import create_table, test_connect, delete_table
+from oracleConnect import create_table, test_connect, delete_table
 
 connect = ''
 

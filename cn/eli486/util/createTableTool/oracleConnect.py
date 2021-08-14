@@ -4,7 +4,7 @@ import logging
 from tkinter.messagebox import showerror
 import time
 
-from eli486.util.createTableTool.MyThread import MyThread
+import MyThread
 
 
 def count_time():

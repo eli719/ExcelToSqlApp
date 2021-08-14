@@ -1,6 +1,6 @@
 from pandas import DataFrame
 from pandas import read_excel
-from eli486.util.createTableTool.Field import *
+from Field import *
 import os
 import logging
 
