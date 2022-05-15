@@ -14,7 +14,7 @@ def create_template(fileName, table_comment):
     logging.info("========创建模板Excel完成=========")
 
 
-def excel_to_sql(fileName):
+def excel_to_sql(fileName, dbType):
     logging.info("========开始解析模板Excel %s=========", fileName)
     table_name = os.path.basename(fileName).split(".")[0]
     logging.info("========表名为 %s=========", table_name)
@@ -33,6 +33,7 @@ def excel_to_sql(fileName):
         f = Field(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7])
         rows.append(f)
     c = []
+    c2 = []
     comments = []
     primary_name = ""
     primaries = []
@@ -44,8 +45,10 @@ def excel_to_sql(fileName):
         comments.append("comment on column " + table_name + "." + j.name + " is '" + j.comment + "'")
         if j.is_empty:
             c.append(j.name + ' ' + j.kinds)
+            c2.append(j.name + ' ' + j.kinds + ' ' + "comment " + "'" + j.comment + "'")
         else:
             c.append(j.name + ' ' + j.kinds + ' ' + 'not null')
+            c2.append(j.name + ' ' + j.kinds + ' ' + 'not null' + ' ' + "comment " + "'" + j.comment + "'")
 
         if str(j.constrainType).lower() == "primary":
             # print(j.constrainName)
@@ -66,15 +69,23 @@ def excel_to_sql(fileName):
     # print(';'.join(constraints))
     # print(';'.join(indexes))
     # print(''.join(comments))
-    body = ','.join(c)
-    create_table_sql = 'CREATE TABLE ' + table_name + '(' + body + ')'
-    comment = "comment on table " + table_name + " is '" + table_comment + "'"
-    sql = [create_table_sql, comment]
+    sql = []
+    if dbType == 1:
+        body = ','.join(c)
+        create_table_sql = 'CREATE TABLE ' + table_name + '(' + body + ')'
+        comment = "comment on table " + table_name + " is '" + table_comment + "'"
+        sql = [create_table_sql, comment]
+        sql.extend(comments)
+    else:
+        body = ','.join(c2)
+        create_table_sql = 'CREATE TABLE ' + table_name + '(' + body + ')'
+        sql = [create_table_sql]
+
     if len(primaries) > 0:
         p = ','.join(primaries)
         primary = ["alter table " + table_name + " add constraint " + primary_name + " primary key (" + p + ")"]
         sql.extend(primary)
-    sql.extend(comments)
+
     sql.extend(constraints)
     sql.extend(indexes)
     drop_sql = "drop table " + table_name

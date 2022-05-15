@@ -39,6 +39,7 @@ def get_address():
 class MyGui:
 
     def __init__(self, init_window_name):
+        self.type = 1
         self.path = StringVar()
         self.fileName = StringVar()
         self.sql = ()
@@ -79,12 +80,13 @@ class MyGui:
         self.mode_file.grid(row=4, column=1, padx=10, pady=10)
         Button(self.init_window_name, text="选择文件", command=self.selectTemplateFile).grid(row=4, column=3, ipadx=20)
         # 第五行
-        Label(self.init_window_name, text="数据库连接地址(user/pwd@ip:port/sid):").grid(row=5, column=0,ipadx=10)
+        Label(self.init_window_name, text="数据库连接地址(user/pwd@ip:port/sid):").grid(row=5, column=0, ipadx=10)
         # self.oracle_address = Entry(self.init_window_name)
 
-        self.oracle_address = Combobox(self.init_window_name, values=self.c,width=35)
+        self.oracle_address = Combobox(self.init_window_name, values=self.c, width=35)
         self.oracle_address.grid(row=5, column=1, pady=10)
-        Button(self.init_window_name, text="Test", command=self.test).grid(row=5, column=3, ipadx=32)
+        Button(self.init_window_name, text="OracleTest", command=self.oracle).grid(row=5, column=2)
+        Button(self.init_window_name, text="MysqlTest", command=self.mysql).grid(row=5, column=3)
         # 第六行
         Button(self.init_window_name, text="解析模板", command=self.parseTemplate).grid(row=6, column=0, ipadx=80)
         Button(self.init_window_name, text="重置", command=self.clear).grid(row=6, column=1)
@@ -135,7 +137,7 @@ class MyGui:
         if file_type != 'xlsx':
             showerror('提示', '暂不支持非EXCEL格式文件解析!')
             return
-        self.sql = excel_to_sql(f)
+        self.sql = excel_to_sql(f, self.type)
         if self.sql is None:
             showinfo('提示', '模板文件内无数据')
 
@@ -144,7 +146,8 @@ class MyGui:
         self.log.yview_moveto(1)
         self.log.update()
 
-    def test(self):
+    def oracle(self):
+        self.type = 1
         global connect
         address = self.oracle_address.get().strip()
         if address == '':
@@ -155,7 +158,33 @@ class MyGui:
             showinfo('提示', '请匹配oracle连接格式:user/pwd@ip:port/sid')
             return
         else:
-            result = test_connect(self.oracle_address.get())
+            result = test_connect(self.oracle_address.get(), self.type)
+            if result:
+                connect = result[1]
+                if self.c.count(address) == 0:
+                    logging.info("数据库连接成功:" + address)
+                    self.c.append(address)
+                    self.oracle_address['values'] = self.c
+                    f = open('address.txt', 'w')
+                    f.write('\n'.join(self.c))
+                    f.close()
+                showinfo('提示', '数据库连接成功')
+            else:
+                showwarning('错误', '数据库连接失败')
+
+    def mysql(self):
+        self.type = 2
+        global connect
+        address = self.oracle_address.get().strip()
+        if address == '':
+            showinfo('提示', '请输入oracle数据库地址')
+        elif re.match(r"^\w+/\w+@(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25["
+                      r"0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d):\d+/\w+$",
+                      address) is None:
+            showinfo('提示', '请匹配oracle连接格式:user/pwd@ip:port/sid')
+            return
+        else:
+            result = test_connect(self.oracle_address.get(), self.type)
             if result:
                 connect = result[1]
                 if self.c.count(address) == 0:
